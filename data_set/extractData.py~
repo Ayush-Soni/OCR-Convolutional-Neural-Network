@@ -15,7 +15,6 @@ for x in xrange(0, 400):    #range stores the entire list in memory, xrange is l
     label = ord(arr[1])
     dataArr = np.vstack([dataArr, data])
     labelArr = np.hstack([labelArr, label])
-
 dataDict = {'data':dataArr, 'label':labelArr}
 fo.close()
 pickle.dump(dataDict, open("ocr_dataset.p", "wb"))

@@ -1,0 +1,14 @@
+c__builtin__
+set
+p1
+((lp2
+S'soni'
+p3
+aS'vora'
+p4
+aS'ayush'
+p5
+aS'akshat'
+p6
+atRp7
+.
