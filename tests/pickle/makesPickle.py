@@ -2,7 +2,6 @@ import cPickle as pickle
 
 my_dict = {"tyro":"beginner", "cacophony":"harsh/unpleasant sounds"}
 my_set = {"ayush","soni","akshat","vora"}
-a = 120.12
 
 pickle.dump(my_dict, open("dict.p","wb"))
 pickle.dump(my_set, open("set.p","wb"))
