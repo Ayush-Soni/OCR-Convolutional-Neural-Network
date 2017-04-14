@@ -1,3 +1,16 @@
+#Importing the pandas library for python, used for reading data from the dataset.csv file.
+import pandas as pd
+
+#Importing the keras library used to build, compile and evaluate the CNN.
+import keras
+
+#Importing backend.
+from keras import backend as K
+
+#Importing this so as to plot the model defined by us.
+import keras.utils.vis_utils
+from keras.utils import plot_model
+
 #Starting by importing numpy and setting a seed for computer's pseudorandom number generator.
 import numpy as np	
 
@@ -17,7 +30,7 @@ from keras.layers import Activation
 from keras.layers import Flatten
 
 #Next importing the CNN Layers, that help us train on large image data.
-from keras.layers import Convolution2D
+from keras.layers import Convolution2D as Conv2D
 from keras.layers import MaxPooling2D
 
 #Importing utilites.
@@ -29,25 +42,80 @@ import cPickle as pickle
 #From sklearn.model_selection importing train_test_split so as to split the data set into test data set and training data set
 from sklearn.model_selection import train_test_split
 
-#Done importing, moving on to importing the pickle file, ocr_dataset.p, which has 52,000+ samples of small case alphabets.
-#Each alphabet is represented by a 16*8 matrix, which is in from of 128 character long array.
-#The extractData.py function	extracts all the data into a Pickle file, where in the data is stores in a data structure with two structures.
-path_to_dataset = "../data_set/ocr_dataset.p";
-data_dictionary = pickle.load(open(path_to_dataset, "rb"));
+ 
+def load_data():
 
-#Extracting data from the dictionary stored in the pickle
-label_array = data_dictionary['label']
-data_arrays = data_dictionary['data']
+	'''
+	Function to load the data from the csv dataset
+	returns:
+		-- datas, binarized character matrices
+		-- labels, in the form of 26 length binary vectors
+	'''
 
-#Dividing data into training set and test set
-data_array_train, data_array_test, label_array_train, label_array_test = train_test_split(data_arrays, label_array, test_size = 0.2, random_state=42);
+	df = pd.read_csv("dataset.csv", header=None)
+	data = np.array(df[1][1:])
+	label = np.array(df[2][1:])
+	datas = np.empty([data.shape[0], 128], dtype=np.float32)
+	labels = np.empty(data.shape[0], dtype=np.uint8)
+	print datas
+	for x in range(data.shape[0]):
+		datas[x] =  (np.fromstring(data[x], 'u1') - ord('0')) #to convert from string to numpy vector
+		labels[x] = ord(label[x]) - ord('a') #character to ASCII
+	labels = keras.utils.to_categorical(labels, 26) # One hot encoding, to make the label into a vector, so that only the corresponding element will be 1 with everything else 0
+	datas=np.reshape(datas, (datas.shape[0], 16, 8, 1)) #Reshape the vector into a proper 16x8 image
+	return datas, labels
 
-#print data_array_train, data_array_test, label_array_train, label_array_test 
+# defining function to build the different layers of the neural network
+def make_model():
+	model = Sequential() #For a sequential neural network
+	
+	model.add(Conv2D(32, kernel_size=(3, 3), activation='relu',input_shape=[16, 8, 1], border_mode='same'))
+	#32x3x3 convolutional filters activated with RELU
 
-#Building the neural network using a sequential model
-model = Sequential()
+	model.add(Conv2D(32, (3,3), activation='relu', border_mode='same'))
+	model.add(Conv2D(64, (3,3), activation='relu', border_mode='same'))
 
-#input dimensions will be 26, because there are 26 classes
-model.add(Dense(units=64, input_dim = 26))
+	model.add(Flatten())
+	#To reshape the data from 64x16x8 to a single long vector of length 64*16*8
+
+	model.add(Dense(256, activation='relu'))
+	#This acts as the classifers for the conv feature maps
+
+	model.add(Dropout(0.5))
+	#Dropout is a great regularization technique, check it out, it's very useful
+
+	model.add(Dense(26, activation='softmax'))
+	#Final predicted output
+	
+	model.compile(loss=keras.losses.categorical_crossentropy, optimizer=keras.optimizers.Adam(), metrics=['accuracy'])
+	#We're using ADAM(a variation of SGD) for optimazation, learning rate goes as a parameter ^ there
+	
+	return model
 
 
+data, label = load_data()
+#Training data is 80% of the entire data set
+data_train = data[:40000]
+label_train = label[:40000]
+#Validation data is 20% of the entire data set
+data_val = data[40000:50000]
+label_val = label[40000:50000]
+data_test = data[50000:]
+label_test = label[50000:]
+
+#Making the model using the function defined previously
+model = make_model()
+
+#Plotting the model made using keras library
+plot_model(model, to_file='ConvolutionalNeuralNetwork.png',show_shapes=True,show_layer_names=True)
+
+#training the model with the training data set, using epochs = 10, meaning it iterates through the entire data set 10 times)
+#And, validation data is 20%, while 80% is training data.
+model.fit(data_train, label_train, batch_size=16, epochs=10, validation_data=(data_val, label_val))
+
+score = model.evaluate(data_test, label_test, verbose=0)
+
+#Printing the results
+print('Test loss:', score[0])
+
+print('Test accuracy:', score[1])

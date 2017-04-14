@@ -12,7 +12,6 @@ while True:
     if not s: break
     arr = re.sub('[^\w]', ' ', s).split()
     data = arr[6:]
-    data = map(int, data)
     label = ord(arr[1])-97
     dataArr = np.vstack([dataArr, data])
     labelArr = np.hstack([labelArr, label])
