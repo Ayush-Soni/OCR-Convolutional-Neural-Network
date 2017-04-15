@@ -82,7 +82,7 @@ def make_model():
 	#This acts as the classifers for the conv feature maps
 
 	model.add(Dropout(0.5))
-	#Dropout is a great regularization technique, check it out, it's very useful
+	#Dropout is a great regularization technique
 
 	model.add(Dense(26, activation='softmax'))
 	#Final predicted output
@@ -111,7 +111,7 @@ plot_model(model, to_file='ConvolutionalNeuralNetwork.png',show_shapes=True,show
 
 #training the model with the training data set, using epochs = 10, meaning it iterates through the entire data set 10 times)
 #And, validation data is 20%, while 80% is training data.
-model.fit(data_train, label_train, batch_size=16, epochs=10, validation_data=(data_val, label_val))
+model.fit(data_train, label_train, batch_size=16, epochs=50, validation_data=(data_val, label_val))
 
 score = model.evaluate(data_test, label_test, verbose=0)
 

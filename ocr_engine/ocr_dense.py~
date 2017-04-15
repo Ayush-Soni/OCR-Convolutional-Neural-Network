@@ -69,11 +69,11 @@ def load_data():
 def make_model():
 	model = Sequential() #For a sequential neural network
 	
-	model.add(Dense(32), activation='relu',input_shape=[16, 8, 1]))
+	model.add(Dense(32, activation='relu',input_shape=[16, 8, 1]))
 	#32x3x3 convolutional filters activated with RELU
 
-	model.add(Dense(32, activation='relu',input_shape=[16, 8, 1]))
-	model.add(Dense(64, activation='relu',input_shape=[16, 8, 1]))
+	model.add(Dense(32, activation='relu'))
+	model.add(Dense(64, activation='relu'))
 
 	model.add(Flatten())
 	#To reshape the data from 64x16x8 to a single long vector of length 64*16*8
@@ -111,7 +111,7 @@ plot_model(model, to_file='DenseNeuralNetwork.png',show_shapes=True,show_layer_n
 
 #training the model with the training data set, using epochs = 10, meaning it iterates through the entire data set 10 times)
 #And, validation data is 20%, while 80% is training data.
-model.fit(data_train, label_train, batch_size=16, epochs=10, validation_data=(data_val, label_val))
+model.fit(data_train, label_train, batch_size=16, epochs=50, validation_data=(data_val, label_val))
 
 score = model.evaluate(data_test, label_test, verbose=0)
 
