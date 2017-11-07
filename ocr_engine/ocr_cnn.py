@@ -78,7 +78,7 @@ def make_model():
 	model.add(Flatten())
 	#To reshape the data from 64x16x8 to a single long vector of length 64*16*8
 
-	model.add(Dense(256, activation='relu'))
+	model.add(Dense(8192, activation='relu'))
 	#This acts as the classifers for the conv feature maps
 
 	model.add(Dropout(0.5))
@@ -111,7 +111,7 @@ plot_model(model, to_file='ConvolutionalNeuralNetwork.png',show_shapes=True,show
 
 #training the model with the training data set, using epochs = 10, meaning it iterates through the entire data set 10 times)
 #And, validation data is 20%, while 80% is training data.
-model.fit(data_train, label_train, batch_size=16, epochs=50, validation_data=(data_val, label_val))
+model.fit(data_train, label_train, batch_size=16, epochs=20, validation_data=(data_val, label_val))
 
 score = model.evaluate(data_test, label_test, verbose=0)
 

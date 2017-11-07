@@ -68,22 +68,13 @@ def load_data():
 # defining function to build the different layers of the neural network
 def make_model():
 	model = Sequential() #For a sequential neural network
-	
-	model.add(Dense(32, activation='relu',input_shape=[16, 8, 1]))
-	#32x3x3 convolutional filters activated with RELU
+	model.add(Flatten())	
+	model.add(Dense(288, activation='relu',input_shape=[16, 8, 1]))
 
-	model.add(Dense(32, activation='relu'))
-	model.add(Dense(64, activation='relu'))
-
-	model.add(Flatten())
-	#To reshape the data from 64x16x8 to a single long vector of length 64*16*8
-
-	model.add(Dense(256, activation='relu'))
-	#This acts as the classifers for the conv feature maps
-
+	model.add(Dense(4096, activation='relu'))
+	model.add(Dense(576, activation='relu'))
+	model.add(Dense(3640, activation='relu'))
 	model.add(Dropout(0.5))
-	#Dropout is a great regularization technique, check it out, it's very useful
-
 	model.add(Dense(26, activation='softmax'))
 	#Final predicted output
 	
